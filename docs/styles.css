@@ -55,12 +55,17 @@ li {
     visibility: visible !important;
 }
 
+#size-estimate {
+    color: lightgray;
+}
+
 #delete-all-btn {
     margin-top: 20px;
     padding: 10px 20px;
     background: #d9534f;
     color: white;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
 }
 
@@ -81,4 +86,19 @@ li {
 
 #download-btn:hover {
     background-color: #0056b3;
+}
+
+#preview-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#preview-btn:hover {
+    background-color: #287b66;
 }

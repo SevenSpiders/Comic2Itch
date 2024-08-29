@@ -19,8 +19,30 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
     }
 });
 
+
+
+function getImages() {
+    let images = document.querySelectorAll('#gallery img');
+    let imageSources = [];
+    images.forEach(element => {
+        imageSources.push(element.src);
+    });
+    return imageSources;
+}
+
+
+
+document.getElementById('preview-btn').addEventListener('click', () => {
+    localStorageManager.saveBigArray(getImages());
+    window.open('ReaderApp/index.html?source=previewButton', '_blank');
+});
+
+
 // Handle file selection
 function handleFiles(files) {
+    if (isBusy) return;
+    isBusy = true;
+
     galleryIndex = 0;
     imageBuffer = [];
     
@@ -38,11 +60,12 @@ function handleFiles(files) {
             reader.onload = (e) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'image-wrapper';
-                // wrapper.bufferIndex = _i;
-
+                
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 img.dataset.name = file.name;
+                img.size = file.size;
+
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.innerText = 'X';
@@ -62,8 +85,10 @@ function handleFiles(files) {
 }
 
 
+
 let imageBuffer = []
 let galleryIndex = 0;
+let isBusy = false;
 
 function AddToGallery(image, index) {
     const gallery = document.getElementById('gallery');
@@ -77,6 +102,8 @@ function AddToGallery(image, index) {
             // console.log("added images");
             // galleryIndex = 0;
             // imageBuffer = [];
+            UpdateSizeEstimate();
+            isBusy = false;
             return;
         }
         if (imageBuffer[galleryIndex] != null) AddToGallery(imageBuffer[galleryIndex], galleryIndex);
@@ -94,14 +121,21 @@ const sortable = Sortable.create(document.getElementById('gallery'), {
     ghostClass: 'sortable-placeholder'
 });
 
-function readFileAsString(filePath, callback) {
-    fetch(filePath)
-        .then(response => response.text())
-        .then(text => callback(text))
-        .catch(error => console.error('Error reading file:', error));
+
+function getTotalSize() {
+    let totalSize = 0;
+    let images = document.querySelectorAll('#gallery img');
+    images.forEach(element => {
+        totalSize += element.size;
+    });
+    return totalSize/1000000;
 }
 
-
+function UpdateSizeEstimate() {
+    const size = Math.round(getTotalSize(),2);
+    const p = document.getElementById('size-estimate');
+    p.innerText = "(size: "+size+"MB)";
+}
 
 
 
@@ -110,6 +144,13 @@ function readFileAsString(filePath, callback) {
 
 // ------------ DOWNLOAD -------------------------------------------
 
+
+function readFileAsString(filePath, callback) {
+    fetch(filePath)
+        .then(response => response.text())
+        .then(text => callback(text))
+        .catch(error => console.error('Error reading file:', error));
+}
 
 
 
@@ -158,3 +199,4 @@ document.getElementById('download-btn').addEventListener('click', () => {
 
     
 });
+

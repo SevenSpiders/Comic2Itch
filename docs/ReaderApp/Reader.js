@@ -8,45 +8,93 @@ let originX = 0, originY = 0;
 let isDragging = false;
 let startX, startY, X0, Y0;
 const moveThreshold = 5;
-
-
+let inPreviewMode = true;
 
 const comicImage = document.getElementById("comicImage");
 const pageIndexElement = document.getElementById("pageIndex");
 
 
-function Start() {
-    showPage(0);
-}
 
-function showPage(index) {
-    if (index > comicImages.length -1) return;
-    if (index < 0) return;
+class Reader {
+    constructor() {
+        this.settingsFilePath = "settings.json";
+        this.settings = {};
 
-    comicImage.src = comicImages[index];
-    pageIndexElement.textContent = `Page ${index + 1} / ${comicImages.length}`;
-}
+        this.images = [];
+        this.loadImages();
+        this.currentIndex = 0;
 
+    }
 
-
-function Click(event) {
-    const rect = comicImage.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-
-    if (x > rect.width / 2) {
-        // Clicked on the right side, go to the next page
-        if (currentPage < comicImages.length - 1) {
-            currentPage++;
-            showPage(currentPage);
+    loadImages() {
+        
+        if (openedViaPreview) {
+            this.images = localStorageManager.getArray();
+            this.showPage();
         }
-    } else {
-        // Clicked on the left side, go to the previous page
-        if (currentPage > 0) {
-            currentPage--;
-            showPage(currentPage);
+        else {
+            loadCSVFile("comic_pages.csv", (images) => {
+                this.images = images;
+                this.showPage();
+            });
+        }
+        
+    }
+
+    async loadSettings() {
+        try {
+            const response = await fetch(this.settingsFilePath);
+            if (!response.ok) {
+                throw new Error(`Failed to load settings from ${this.settingsFilePath}`);
+            }
+            this.settings = await response.json();
+        } catch (error) {
+            console.error("Error loading settings:", error);
+        }
+    }
+
+
+    showPage() {
+        comicImage.src = this.images[this.currentIndex];
+        pageIndexElement.textContent = `Page ${this.currentIndex + 1} / ${this.images.length}`;
+    }
+
+    nextPage() {
+        if (this.currentIndex < this.images.length - 1) {
+            this.currentIndex++;
+            this.showPage();
+        }
+    }
+
+    previousPage() {
+        if (this.currentIndex > 0) {
+            this.currentIndex--;
+            this.showPage();
+        }
+    }
+
+    goToPage(index) {
+        if (index >= 0 && index < this.images.length) {
+            this.currentIndex = index;
+            this.showPage();
+        }
+    }
+
+    click(event) {
+        const rect = comicImage.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+
+        if (x > rect.width / 2) {
+            this.nextPage();
+        } else {
+            this.previousPage();
         }
     }
 }
+
+
+
+
 
 
 
@@ -89,12 +137,15 @@ document.addEventListener("mouseup", (event) => {
     isDragging = false;
     const movedX = Math.abs(event.clientX - X0);
     const movedY = Math.abs(event.clientY - Y0);
-    console.log("X: " +movedX + ", Y: " + movedY);
-    if (movedX < moveThreshold && movedY < moveThreshold) Click(event);
+    // console.log("X: " +movedX + ", Y: " + movedY);
+    if (movedX < moveThreshold && movedY < moveThreshold) reader.click(event);
 });
 
 
 
 
 
-Start();
+const reader = new Reader();
+reader.showPage();
+
+
