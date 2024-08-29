@@ -40,9 +40,8 @@ document.getElementById('preview-btn').addEventListener('click', () => {
 
 // Handle file selection
 function handleFiles(files) {
-    if (isBusy) return;
-    isBusy = true;
-
+    // if (isBusy) return; // => fix bug where one of the elements is not a image
+    
     galleryIndex = 0;
     imageBuffer = [];
     
@@ -53,9 +52,11 @@ function handleFiles(files) {
 
     const gallery = document.getElementById('gallery');
     for (let i = 0; i < files.length; i++) {
-        imageBuffer.push(null);
+        
         const file = files[i];
         if (file.type.startsWith('image/')) {
+            imageBuffer.push(null);
+            isBusy = true;
             const reader = new FileReader();
             reader.onload = (e) => {
                 const wrapper = document.createElement('div');
@@ -76,7 +77,6 @@ function handleFiles(files) {
 
                 wrapper.appendChild(img);
                 wrapper.appendChild(deleteBtn);
-                // gallery.appendChild(wrapper);
                 AddToGallery(wrapper, i);
             };
             reader.readAsDataURL(file);
@@ -132,7 +132,7 @@ function getTotalSize() {
 }
 
 function UpdateSizeEstimate() {
-    const size = Math.round(getTotalSize(),2);
+    const size = getTotalSize().toFixed(2);
     const p = document.getElementById('size-estimate');
     p.innerText = "(size: "+size+"MB)";
 }
