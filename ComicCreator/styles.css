@@ -1,0 +1,50 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+#drop-area {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+#drop-area p {
+    margin: 0;
+}
+
+#gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+#gallery img {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: grab;
+}
+
+.sortable-placeholder {
+    background: #f0f0f0;
+    border: 1px dashed #ccc;
+    visibility: visible !important;
+}
+
+#download-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+#download-btn:hover {
+    background-color: #0056b3;
+}
