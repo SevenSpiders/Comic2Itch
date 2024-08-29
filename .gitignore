@@ -1,0 +1,15 @@
+# Ignore todo.txt
+todo.txt
+
+# Ignore all .todo.txt files (e.g., project-specific or backup files)
+*.todo.txt
+
+# Ignore backup or temporary files related to todo.txt
+todo.txt~
+todo.txt.bak
+.todo_backup/
+
+# Ignore any logs or temporary files
+*.log
+*.tmp
+*.swp
