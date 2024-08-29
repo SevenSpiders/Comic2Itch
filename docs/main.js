@@ -21,7 +21,6 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
 
 // Handle file selection
 function handleFiles(files) {
-    console.log(typeof(files));
     galleryIndex = 0;
     imageBuffer = [];
     
@@ -36,7 +35,6 @@ function handleFiles(files) {
         const file = files[i];
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
-            console.log("load image: "  + file.name + " index: " + i);
             reader.onload = (e) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'image-wrapper';
@@ -69,10 +67,8 @@ let galleryIndex = 0;
 
 function AddToGallery(image, index) {
     const gallery = document.getElementById('gallery');
-    console.log("check "+image.bufferIndex);
     
     if (index == galleryIndex) {
-        console.log("add to gallery " + index);
         gallery.appendChild(image);
         galleryIndex += 1;
 
