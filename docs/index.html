@@ -8,13 +8,21 @@
 </head>
 <body>
     <h1>Comic Page Uploader</h1>
+    <ol>
+        <li>Drop your comic pages in the Drop Zone</li>
+        <li>Drag to sort the pages to the correct order or delete them</li>
+        <li>Click "Download ZIP"</li>
+        <li>Upload the downloaded zip file to your itch project</li>
+    </ol>
     <div id="drop-area">
+        <h3>DROP ZONE</h3>
         <p>Drop comic pages here</p>
     </div>
     <div id="gallery" class="sortable">
         <!-- Uploaded images will appear here -->
     </div>
-    <button id="download-btn">Download All as ZIP</button>
+    <button id="delete-all-btn">Delete All</button>
+    <button id="download-btn">Download ZIP</button>
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>

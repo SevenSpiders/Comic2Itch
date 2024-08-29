@@ -12,22 +12,84 @@ document.getElementById('drop-area').addEventListener('drop', (event) => {
     handleFiles(files);
 });
 
+document.getElementById('delete-all-btn').addEventListener('click', () => {
+    const gallery = document.getElementById('gallery');
+    while (gallery.firstChild) {
+        gallery.removeChild(gallery.firstChild);
+    }
+});
+
 // Handle file selection
 function handleFiles(files) {
+    console.log(typeof(files));
+    galleryIndex = 0;
+    imageBuffer = [];
+    
+    // sort files alphabetically and by base ("page11" > "page2")
+    files = Array.from(files).sort((a, b) => {
+        return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+    });
+
     const gallery = document.getElementById('gallery');
     for (let i = 0; i < files.length; i++) {
+        imageBuffer.push(null);
         const file = files[i];
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
+            console.log("load image: "  + file.name + " index: " + i);
             reader.onload = (e) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'image-wrapper';
+                // wrapper.bufferIndex = _i;
+
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.dataset.name = file.name; // Store original file name
-                gallery.appendChild(img);
+                img.dataset.name = file.name;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerText = 'X';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.addEventListener('click', () => {
+                    gallery.removeChild(wrapper);
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(deleteBtn);
+                // gallery.appendChild(wrapper);
+                AddToGallery(wrapper, i);
             };
             reader.readAsDataURL(file);
         }
     }
+}
+
+
+let imageBuffer = []
+let galleryIndex = 0;
+
+function AddToGallery(image, index) {
+    const gallery = document.getElementById('gallery');
+    console.log("check "+image.bufferIndex);
+    
+    if (index == galleryIndex) {
+        console.log("add to gallery " + index);
+        gallery.appendChild(image);
+        galleryIndex += 1;
+
+        // check buffer
+        if (galleryIndex >= imageBuffer.length) {
+            // console.log("added images");
+            // galleryIndex = 0;
+            // imageBuffer = [];
+            return;
+        }
+        if (imageBuffer[galleryIndex] != null) AddToGallery(imageBuffer[galleryIndex], galleryIndex);
+    }
+
+    else {
+        imageBuffer[index] = image;
+    }
+    
 }
 
 // Initialize sortable functionality
@@ -50,7 +112,7 @@ function readFileAsString(filePath, callback) {
 
 
 
-
+// ------------ DOWNLOAD -------------------------------------------
 
 
 

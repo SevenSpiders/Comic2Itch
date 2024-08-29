@@ -4,11 +4,16 @@ body {
     padding: 20px;
 }
 
+li {
+    text-align: left;
+}
+
 #drop-area {
     border: 2px dashed #ccc;
     padding: 20px;
     margin-bottom: 20px;
     cursor: pointer;
+    color: #3f3bbb;
 }
 
 #drop-area p {
@@ -28,10 +33,39 @@ body {
     cursor: grab;
 }
 
+.image-wrapper {
+    display: inline-block;
+    position: relative;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+
 .sortable-placeholder {
     background: #f0f0f0;
     border: 1px dashed #ccc;
     visibility: visible !important;
+}
+
+#delete-all-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #d9534f;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#delete-all-btn:hover {
+    background-color: black;
 }
 
 #download-btn {
