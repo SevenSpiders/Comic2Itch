@@ -17,7 +17,27 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
     while (gallery.firstChild) {
         gallery.removeChild(gallery.firstChild);
     }
+    UpdateSizeEstimate();
 });
+
+let settings = {}
+function loadSettings() {
+    fetch("ReaderApp/settings.json")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse the JSON file into a JavaScript object
+        })
+        .then(data => {
+            settings = data;
+        })
+        .catch(error => {
+            console.error("There was a problem with the fetch operation:", error);
+        });
+}
+loadSettings();
+
 
 
 function getImages() {
@@ -141,7 +161,12 @@ function UpdateSizeEstimate() {
 }
 
 
-
+function updateSettings() {
+    const title = document.getElementById('titleInput').value || "Title";
+    const author = document.getElementById('authorInput').value || "Author";
+    settings.author = author;
+    settings.title = title;
+}
 
 
 
@@ -190,12 +215,16 @@ function Download() {
         if (index < images.length -1) pagePaths += '\n';
     });
 
-    zip.file('comic_pages.csv', pagePaths);
+    zip.file('images/comic_pages.csv', pagePaths);
+
+    updateSettings();
+    const settingsString = JSON.stringify(settings, null, 4);
+    zip.file('settings.json', settingsString);
     
     // Create an array of promises for each packaging operation
     const promises = [
         package(zip, 'Reader.js'),
-        package(zip, 'settings.json'),
+        // package(zip, 'settings.json'),
         package(zip, 'PageLoader.js'),
         package(zip, 'LocalStorageManager.js'),
         package(zip, 'styles.css'),
@@ -204,6 +233,7 @@ function Download() {
         package(zip, 'resetIcon.png', 'UIAssets/', true),
         package(zip, 'warningIcon.png', 'UIAssets/', true),
         package(zip, 'fullScreenIcon.png', 'UIAssets/', true),
+        package(zip, 'closeIcon.png', 'UIAssets/', true),
         package(zip, 'favicon-16x16.png', 'favicon/', true),
         package(zip, 'favicon-32x32.png', 'favicon/', true),
         package(zip, 'favicon.ico', 'favicon/', true)
@@ -226,55 +256,3 @@ function Download() {
 }
 
 document.getElementById('download-btn').addEventListener('click', Download );
-
-
-// Handle ZIP download
-// document.getElementById('download-btn').addEventListener('click', () => {
-//     const zip = new JSZip();
-//     const images = document.querySelectorAll('#gallery img');
-//     let pagePaths = "";
-
-//     images.forEach((img, index) => {
-//         const imgData = img.src.split(',')[1]; // Get base64 data
-//         const extension = img.src.split(';')[0].split('/')[1]; // Get image extension
-//         const imgName = `page_${index + 1}.${extension}`;
-//         zip.file(`images/${imgName}`, imgData, { base64: true });
-//         pagePaths += `images/${imgName}`;
-//         if (index < images.length -1) pagePaths += '\n';
-//     });
-
-//     zip.file('comic_pages.csv', pagePaths);
-
-
-//     package(zip, 'settings.json');
-//     package(zip, 'PageLoader.js');
-//     package(zip, 'LocalStorageManager.js');
-//     package(zip, 'styles.css');
-//     package(zip, 'index.html');
-//     package(zip, 'arrowIcon.png', 'UIAssets/');
-//     package(zip, 'resetIcon.png', 'UIAssets/');
-//     package(zip, 'warningIcon.png', 'UIAssets/');
-//     package(zip, 'favicon-16x16.png', 'favicon/');
-//     package(zip, 'favicon-32x32.png', 'favicon/');
-//     package(zip, 'favicon.ico', 'favicon/');
-
-
-//     readFileAsString('ReaderApp/Reader.js', (readerJs) => {
-//         zip.file('Reader.js', readerJs);
-
-        
-//     });
-
-
-//     zip.generateAsync({ type: 'blob' })
-//             .then((content) => {
-//                 const a = document.createElement('a');
-//                 a.href = URL.createObjectURL(content);
-//                 a.download = 'itchComic.zip';
-//                 a.click();
-//         });
-
-    
-    
-// });
-

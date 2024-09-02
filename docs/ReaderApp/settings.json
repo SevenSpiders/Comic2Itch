@@ -1,8 +1,9 @@
 {
     "canZoom": true,
     "canDrag": true,
-    "author": "name",
-    "title": "title",
-    "description": "description"
+
+    "author": "Author",
+    "title": "Title",
+    "description": "Describe your comic here"
 
 }

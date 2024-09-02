@@ -23,6 +23,10 @@ document.addEventListener('keydown', function(event) {
         case 'R':
             reader.resetPage();
             break;
+        case 'f':
+        case 'F':
+            reader.fullScreen();
+            break;
         default:
             break;
     }
@@ -48,6 +52,7 @@ class Reader {
         this.comicImage.addEventListener("dragstart", (event) => {
             event.preventDefault();
         });
+        this.infoShown = false;
         
         this.resetPage();
         comicImage.addEventListener('wheel', (event) => this.handleInputScroll(event));
@@ -59,6 +64,8 @@ class Reader {
 
         arrowLeft.addEventListener('click', () => this.previousPage());
         arrowRight.addEventListener('click', () => this.nextPage());
+        document.getElementById('infoIcon').addEventListener('click', () => this.showInfoPanel());
+        document.getElementById('closeInfoPanel').addEventListener('click', () => this.hideInfoPanel());
     }
 
     loadImages() {
@@ -68,7 +75,7 @@ class Reader {
             this.showPage();
         }
         else {
-            loadCSVFile("comic_pages.csv", (images) => {
+            loadCSVFile("images/comic_pages.csv", (images) => {
                 this.images = images;
                 this.showPage();
             });
@@ -193,6 +200,19 @@ class Reader {
             });
         }
     };
+
+
+    showInfoPanel() {
+        document.getElementById('comicTitle').textContent = settings.title || 'Comic Title';
+        document.getElementById('comicAuthor').textContent = `Author: ${settings.author || 'Unknown'}`;
+        document.getElementById('comicDescription').textContent = settings.description || 'No description available.';
+
+        infoOverlay.style.display = 'flex';
+    }
+
+    hideInfoPanel() {
+        infoOverlay.style.display = 'none';
+    }
 }
 
 

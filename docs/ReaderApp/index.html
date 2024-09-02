@@ -11,14 +11,23 @@
 <body>
     <div id="container">
         <img id="comicImage" src="images/placeHolder.jpeg" alt="Comic Page">
+
+        <div class="overlay" id="infoOverlay">
+            <div id="info-panel">
+                <h2 id="comicTitle">Comic Title</h2>
+                <p id="comicAuthor">Author: John Doe</p>
+                <p id="comicDescription">This is a short description of the comic currently being displayed.</p>
+                <img class="close-btn" id="closeInfoPanel" src="UIAssets/closeIcon.png">
+            </div>
+        </div>
     
 
-        <div id="controlPanel">
+        <div id="control-panel">
             <img class="icon arrow left" src="UIAssets/arrowIcon.png">
             <div id="pageIndex">Page 0</div>
             <img class="icon arrow right" src="UIAssets/arrowIcon.png">
         </div>
-        <div id="infoPanel">
+        <div id="button-panel">
             <img id="resetIcon" class="icon" src="UIAssets/resetIcon.png">
             <img id="infoIcon" class="icon" src="UIAssets/warningIcon.png">
             <img id="fullScreenIcon" class="icon" src="UIAssets/fullScreenIcon.png">
