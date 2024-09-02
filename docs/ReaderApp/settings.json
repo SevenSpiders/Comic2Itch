@@ -4,6 +4,7 @@
 
     "author": "Author",
     "title": "Title",
-    "description": "Describe your comic here"
+    "description": "Describe your comic here",
+    "backgroundColor": "black"
 
 }

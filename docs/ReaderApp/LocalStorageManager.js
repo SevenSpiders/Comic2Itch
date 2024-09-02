@@ -32,6 +32,17 @@ class LocalStorageManager {
         localStorage.setItem(this.key, JSON.stringify(array));
     }
 
+    saveItem(obj, key) {
+        localStorage.setItem(key, JSON.stringify(obj));
+    }
+
+    loadItem(key) {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : {};
+    }
+
+
+
     // Add an item to the array in localStorage
     addItem(newItem) {
         const array = this.getArray();

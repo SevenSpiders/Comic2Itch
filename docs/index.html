@@ -7,28 +7,49 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Comic To Itch</h1>
+    <h1>Comic to itch.io</h1>
     <ol>
         <li>Drop your comic pages in the Drop Zone</li>
         <li>Drag to sort the pages. Click on [x] to delete them</li>
+        <li>Update "Comic Info" (title, author, description...)</li>
         <li>Click "Download ZIP"</li>
         <li>Upload the downloaded zip file to your itch project</li>
     </ol>
     <div id="drop-area">
         <h3>DROP ZONE</h3>
         <p>Drop comic pages here</p>
+        <p id="size-estimate">(size: 0MB)</p>
+
     </div>
     <div class="middle">
-        <input type="text" id="authorInput" placeholder="Author">
-        <input type="text" id="titleInput" placeholder="Title">
-        <!-- <textarea id="description" name="description" rows="4" cols="50" placeholder="Enter a short description..."></textarea> -->
-        <p id="size-estimate">(size: 0MB)</p>
+                
+        
+        <p></p>
+        <div class="overlay" id="infoOverlay">
+            <div id="info-panel">
+                <h2>Comic Info</h2>
+                <input class="setting-option" type="text" id="titleInput" placeholder="Title"><br>
+                <input class="setting-option" type="text" id="authorInput" placeholder="Author"><br>
+                <textarea class="setting-option" id="descriptionInput" name="description" rows="4" cols="50" placeholder="Enter a short description..."></textarea>
+                <p class="setting-option singleLine">
+                    <input id="checkZoomDrag" type="checkbox" checked> Can zoom and drag images
+                </p>
+                <p class="setting-option singleLine">
+                    <input id="colorPicker" type="color">Background Color
+                </p>
+                
+                
+                <img class="close-btn" id="closeInfoPanel" src="ReaderApp/UIAssets/closeIcon.png">
+            </div>
+        </div>
+        
     </div>
     
     <div id="gallery" class="sortable">
         <!-- Uploaded images will appear here -->
     </div>
     <button id="delete-all-btn">Delete All</button>
+    <button id="settings-btn">Comic Info</button>
     <button id="download-btn">Download ZIP</button>
     <button id="preview-btn">Preview (3MB)</button>
 

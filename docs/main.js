@@ -38,6 +38,13 @@ function loadSettings() {
 }
 loadSettings();
 
+document.getElementById('settings-btn').addEventListener('click', function() {
+    const infoOverlay = document.getElementById('infoOverlay');
+    infoOverlay.style.display = 'flex';
+});
+
+document.getElementById('closeInfoPanel').addEventListener('click', () => {infoOverlay.style.display = 'none'});
+
 
 
 function getImages() {
@@ -53,6 +60,8 @@ function getImages() {
 
 document.getElementById('preview-btn').addEventListener('click', () => {
     localStorageManager.saveBigArray(getImages());
+    updateSettings();
+    localStorageManager.saveItem(settings, "settings");
     window.open('ReaderApp/index.html?source=previewButton', '_blank');
 });
 
@@ -95,6 +104,7 @@ function handleFiles(files) {
                 deleteBtn.className = 'delete-btn';
                 deleteBtn.addEventListener('click', () => {
                     gallery.removeChild(wrapper);
+                    UpdateSizeEstimate();
                 });
 
                 wrapper.appendChild(img);
@@ -164,8 +174,15 @@ function UpdateSizeEstimate() {
 function updateSettings() {
     const title = document.getElementById('titleInput').value || "Title";
     const author = document.getElementById('authorInput').value || "Author";
+    const description = document.getElementById('descriptionInput').value || "A short description";
+    const canZoom = document.getElementById('checkZoomDrag').checked;
+    const color = document.getElementById('colorPicker').value;
     settings.author = author;
     settings.title = title;
+    settings.description = description;
+    settings.canZoom = canZoom;
+    settings.canDrag = canZoom;
+    settings.backgroundColor = color;
 }
 
 
@@ -173,7 +190,7 @@ function updateSettings() {
 // ------------ DOWNLOAD -------------------------------------------
 
 
-function readFileAsString(filePath, callback) {
+async function readFileAsString(filePath, callback) {
     return fetch(filePath)
         .then(response => response.text())
         .then(text => callback(text))
@@ -188,7 +205,7 @@ async function readImage(filePath, callback) {
 }
 
 
-function package(zip, fileName, filePath = "", isImage = false) {
+async function package(zip, fileName, filePath = "", isImage = false) {
     let callback = (f) => {
         zip.file(filePath + fileName, f);
     }
@@ -224,7 +241,6 @@ function Download() {
     // Create an array of promises for each packaging operation
     const promises = [
         package(zip, 'Reader.js'),
-        // package(zip, 'settings.json'),
         package(zip, 'PageLoader.js'),
         package(zip, 'LocalStorageManager.js'),
         package(zip, 'styles.css'),
@@ -239,10 +255,7 @@ function Download() {
         package(zip, 'favicon.ico', 'favicon/', true)
     ];
 
-    Promise.all(promises).then(() => {
-        console.log("All files have been packaged and zipped.");
-        
-        // Now you can continue with the zip file, e.g., save or download it
+    Promise.all(promises).then(() => {        
         zip.generateAsync({ type: 'blob' })
             .then((content) => {
                 const a = document.createElement('a');

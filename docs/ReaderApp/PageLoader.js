@@ -28,4 +28,13 @@ function loadSettings() {
         });
 }
 
-loadSettings();
+function checkIfOpenedInPreview() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('source') === 'previewButton';
+}
+
+
+
+if (checkIfOpenedInPreview()) {
+    settings = localStorageManager.loadItem("settings");
+} else loadSettings();

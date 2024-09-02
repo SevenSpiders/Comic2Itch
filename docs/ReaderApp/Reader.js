@@ -33,14 +33,8 @@ document.addEventListener('keydown', function(event) {
 });
 
 
-function checkIfOpenedInPreview() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('source') === 'previewButton';
-}
-
 class Reader {
     constructor() {
-        this.settingsFilePath = "settings.json";
 
         this.images = [];
         this.loadImages();
@@ -52,12 +46,12 @@ class Reader {
         this.comicImage.addEventListener("dragstart", (event) => {
             event.preventDefault();
         });
-        this.infoShown = false;
         
         this.resetPage();
         comicImage.addEventListener('wheel', (event) => this.handleInputScroll(event));
         comicImage.addEventListener('mousedown', (event) => this.handleMouseDown(event));
         comicImage.addEventListener('mousemove', (event) => this.handleDrag(event));
+        // document.addEventListener('mouseup', (event) => this.handleMouseUp(event));
         comicImage.addEventListener('mouseup', (event) => this.handleMouseUp(event));
         document.getElementById("resetIcon").addEventListener('click',() => this.showPage());
         document.getElementById("fullScreenIcon").addEventListener('click', () => this.fullScreen());
@@ -66,6 +60,7 @@ class Reader {
         arrowRight.addEventListener('click', () => this.nextPage());
         document.getElementById('infoIcon').addEventListener('click', () => this.showInfoPanel());
         document.getElementById('closeInfoPanel').addEventListener('click', () => this.hideInfoPanel());
+        this.updateBackground();
     }
 
     loadImages() {
@@ -83,17 +78,17 @@ class Reader {
         
     }
 
-    async loadSettings() {
-        try {
-            const response = await fetch(this.settingsFilePath);
-            if (!response.ok) {
-                throw new Error(`Failed to load settings from ${this.settingsFilePath}`);
-            }
-            this.settings = await response.json();
-        } catch (error) {
-            console.error("Error loading settings:", error);
-        }
-    }
+    // async loadSettings() {
+    //     try {
+    //         const response = await fetch("settings.json");
+    //         if (!response.ok) throw new Error(`Failed to load settings from ${"settings.json"}`);
+            
+    //         this.settings = await response.json();
+    //         this.updateBackground();
+    //     } catch (error) {
+    //         console.error("Error loading settings:", error);
+    //     }
+    // }
 
 
     showPage() {
@@ -130,6 +125,11 @@ class Reader {
 
         if (x > rect.width / 2) { this.nextPage();} 
         else { this.previousPage(); }
+    }
+
+    clickContainer(event) {
+        if (this.isDragging) return;
+        this.click(event);
     }
 
     handleInputScroll(event) {
@@ -212,6 +212,10 @@ class Reader {
 
     hideInfoPanel() {
         infoOverlay.style.display = 'none';
+    }
+
+    updateBackground() {
+        document.body.style.backgroundColor = settings.backgroundColor || "black";
     }
 }
 
