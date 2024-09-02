@@ -19,6 +19,10 @@ document.addEventListener('keydown', function(event) {
         case 'ArrowRight':
             reader.nextPage();
             break;
+        case 'r':
+        case 'R':
+            reader.resetPage();
+            break;
         default:
             break;
     }
@@ -124,7 +128,7 @@ class Reader {
     handleInputScroll(event) {
         if (!settings.canZoom) return;
         event.preventDefault();
-        const zoomFactor = 0.1;
+        const zoomFactor = 0.2;
         if (event.deltaY < 0) {
             this.scale = Math.min(this.scale + zoomFactor, 3); // Max scale
         } else {
@@ -198,6 +202,3 @@ class Reader {
 
 const reader = new Reader();
 reader.showPage();
-
-
-console.log(reader)
