@@ -1,34 +1,65 @@
 
 
-let currentPage = 0;
-
-// Zoom and Pan functionality
-let scale = 1;
-let originX = 0, originY = 0;
-let isDragging = false;
-let startX, startY, X0, Y0;
-const moveThreshold = 5;
-let inPreviewMode = true;
-
 const comicImage = document.getElementById("comicImage");
 const pageIndexElement = document.getElementById("pageIndex");
+const arrowLeft = document.getElementsByClassName("arrow left")[0];
+const arrowRight = document.getElementsByClassName("arrow right")[0];
+
+document.addEventListener('keydown', function(event) {
+    switch(event.key) {
+        case 'a':
+        case 'A':
+        case 'ArrowLeft':
+            reader.previousPage();
+            break;
+
+        case ' ':
+        case 'D':
+        case 'd':
+        case 'ArrowRight':
+            reader.nextPage();
+            break;
+        default:
+            break;
+    }
+});
 
 
+function checkIfOpenedInPreview() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('source') === 'previewButton';
+}
 
 class Reader {
     constructor() {
         this.settingsFilePath = "settings.json";
-        this.settings = {};
 
         this.images = [];
         this.loadImages();
         this.currentIndex = 0;
 
+        this.moveThreshold = 5;
+        this.comicImage = document.getElementById("comicImage");
+        this.pageIndexElement = document.getElementById("pageIndex");
+        this.comicImage.addEventListener("dragstart", (event) => {
+            event.preventDefault();
+        });
+        
+        this.resetPage();
+        comicImage.addEventListener('wheel', (event) => this.handleInputScroll(event));
+        comicImage.addEventListener('mousedown', (event) => this.handleMouseDown(event));
+        comicImage.addEventListener('mousemove', (event) => this.handleDrag(event));
+        comicImage.addEventListener('mouseup', (event) => this.handleMouseUp(event));
+        document.getElementById("resetIcon").addEventListener('click',() => this.showPage());
+        document.getElementById("fullScreenIcon").addEventListener('click', () => this.fullScreen());
+
+        arrowLeft.addEventListener('click', () => this.previousPage());
+        arrowRight.addEventListener('click', () => this.nextPage());
     }
 
     loadImages() {
         
-        if (openedViaPreview) {
+        if (checkIfOpenedInPreview()) {
             this.images = localStorageManager.getArray();
             this.showPage();
         }
@@ -55,8 +86,10 @@ class Reader {
 
 
     showPage() {
+        this.resetPage();
         comicImage.src = this.images[this.currentIndex];
         pageIndexElement.textContent = `Page ${this.currentIndex + 1} / ${this.images.length}`;
+        this.resetPage();
     }
 
     nextPage() {
@@ -84,62 +117,80 @@ class Reader {
         const rect = comicImage.getBoundingClientRect();
         const x = event.clientX - rect.left;
 
-        if (x > rect.width / 2) {
-            this.nextPage();
-        } else {
-            this.previousPage();
-        }
+        if (x > rect.width / 2) { this.nextPage();} 
+        else { this.previousPage(); }
     }
+
+    handleInputScroll(event) {
+        if (!settings.canZoom) return;
+        event.preventDefault();
+        const zoomFactor = 0.1;
+        if (event.deltaY < 0) {
+            this.scale = Math.min(this.scale + zoomFactor, 3); // Max scale
+        } else {
+            this.scale = Math.max(this.scale - zoomFactor, 1); // Min scale
+        }
+        this.comicImage.style.transform = `scale(${this.scale}) translate(${this.originX}px, ${this.originY}px)`;
+    }
+
+    
+    handleMouseDown(event) {
+        event.preventDefault(); // Prevent default behavior
+        this.isDragging = true;
+        this.startX = event.clientX - this.originX;
+        this.startY = event.clientY - this.originY;
+        this.X0 = event.clientX;
+        this.Y0 = event.clientY;
+    }
+
+    handleDrag(event) {
+        if (!this.isDragging) return;
+        
+        this.originX = event.clientX - this.startX;
+        this.originY = event.clientY - this.startY;
+        this.updateTransform();
+    }
+
+    updateTransform() {
+        const _scale = settings.canZoom ? this.scale : 1;
+        const _oX = settings.canDrag ? this.originX : 0;
+        const _oY = settings.canDrag ? this.originY : 0;
+        comicImage.style.transform = `scale(${_scale}) translate(${_oX}px, ${_oY}px)`;
+    }
+
+
+    handleMouseUp(event) {
+        this.isDragging = false;
+        const movedX = Math.abs(event.clientX - this.X0);
+        const movedY = Math.abs(event.clientY - this.Y0);
+        // console.log("X: " +movedX + ", Y: " + movedY);
+        if (movedX < this.moveThreshold && movedY < this.moveThreshold) this.click(event);
+    }
+
+    resetPage() {
+        comicImage.style.transform = 'scale(1) translate(0px, 0px)';
+        this.scale = 1;
+        this.isDragging = false;
+        this.originX = 0;
+        this.originY = 0;
+        this.startX = 0;
+        this.startY = 0;
+        this.X0 = 0;
+        this.Y0 = 0;
+    }
+
+    fullScreen() {
+        const container = document.getElementById("container");
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            container.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+        }
+    };
 }
 
-
-
-
-
-
-
-// ZOOOOOM
-
-// Prevent the default drag behavior
-comicImage.addEventListener("dragstart", (event) => {
-    event.preventDefault();
-});
-
-comicImage.addEventListener("wheel", (event) => {
-    event.preventDefault();
-    const zoomFactor = 0.1;
-    if (event.deltaY < 0) {
-        scale = Math.min(scale + zoomFactor, 3); // Max scale
-    } else {
-        scale = Math.max(scale - zoomFactor, 1); // Min scale
-    }
-    comicImage.style.transform = `scale(${scale}) translate(${originX}px, ${originY}px)`;
-});
-
-comicImage.addEventListener("mousedown", (event) => {
-    event.preventDefault(); // Prevent default behavior
-    isDragging = true;
-    startX = event.clientX - originX;
-    startY = event.clientY - originY;
-    X0 = event.clientX;
-    Y0 = event.clientY;
-});
-
-document.addEventListener("mousemove", (event) => {
-    if (isDragging) {
-        originX = event.clientX - startX;
-        originY = event.clientY - startY;
-        comicImage.style.transform = `scale(${scale}) translate(${originX}px, ${originY}px)`;
-    }
-});
-
-document.addEventListener("mouseup", (event) => {
-    isDragging = false;
-    const movedX = Math.abs(event.clientX - X0);
-    const movedY = Math.abs(event.clientY - Y0);
-    // console.log("X: " +movedX + ", Y: " + movedY);
-    if (movedX < moveThreshold && movedY < moveThreshold) reader.click(event);
-});
 
 
 
@@ -149,3 +200,4 @@ const reader = new Reader();
 reader.showPage();
 
 
+console.log(reader)

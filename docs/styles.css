@@ -38,6 +38,12 @@ li {
     position: relative;
 }
 
+.image-title {
+    padding: 5px;
+    color: #00000061;
+    overflow: clip;
+}
+
 .delete-btn {
     position: absolute;
     top: 5px;

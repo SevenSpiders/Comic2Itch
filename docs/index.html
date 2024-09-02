@@ -10,7 +10,7 @@
     <h1>Comic To Itch</h1>
     <ol>
         <li>Drop your comic pages in the Drop Zone</li>
-        <li>Drag to sort the pages to the correct order or delete them</li>
+        <li>Drag to sort the pages or delete them</li>
         <li>Click "Download ZIP"</li>
         <li>Upload the downloaded zip file to your itch project</li>
     </ol>
@@ -18,7 +18,12 @@
         <h3>DROP ZONE</h3>
         <p>Drop comic pages here</p>
     </div>
-    <p id="size-estimate">(size: 0MB)</p>
+    <div class="middle">
+        <input type="text" id="textInput" placeholder="Author">
+        <input type="text" id="textInput" placeholder="Title">
+        <p id="size-estimate">(size: 0MB)</p>
+    </div>
+    
     <div id="gallery" class="sortable">
         <!-- Uploaded images will appear here -->
     </div>

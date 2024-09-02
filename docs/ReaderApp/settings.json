@@ -1,3 +1,8 @@
 {
-    "inPreviewMode": false
+    "canZoom": true,
+    "canDrag": true,
+    "author": "name",
+    "title": "title",
+    "description": "description"
+
 }

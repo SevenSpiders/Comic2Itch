@@ -4,13 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Comic Reader</title>
+    
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon/favicon.ico" type="image/png">
 </head>
 <body>
     <div id="container">
         <img id="comicImage" src="images/placeHolder.jpeg" alt="Comic Page">
+    
+
+    <div id="controlPanel">
+        <img class="icon arrow left" src="UIAssets/arrowIcon.png">
+        <div id="pageIndex">Page 0</div>
+        <img class="icon arrow right" src="UIAssets/arrowIcon.png">
     </div>
-    <div id="pageIndex">Page 0</div>
+    <div id="infoPanel">
+        <img id="resetIcon" class="icon" src="UIAssets/resetIcon.png">
+        <img id="infoIcon" class="icon" src="UIAssets/warningIcon.png">
+        <img id="fullScreenIcon" class="icon" src="UIAssets/fullScreenIcon.png">
+    </div>
+
+    </div>
+    
     
     <script src="PageLoader.js"></script>
     <script src="LocalStorageManager.js"></script>

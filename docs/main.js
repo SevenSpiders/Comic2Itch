@@ -20,7 +20,6 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
 });
 
 
-
 function getImages() {
     let images = document.querySelectorAll('#gallery img');
     let imageSources = [];
@@ -66,7 +65,10 @@ function handleFiles(files) {
                 img.src = e.target.result;
                 img.dataset.name = file.name;
                 img.size = file.size;
-
+                
+                const title = document.createElement('div');
+                title.className = "image-title";
+                title.innerText = files[i].name;
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.innerText = 'X';
@@ -76,6 +78,7 @@ function handleFiles(files) {
                 });
 
                 wrapper.appendChild(img);
+                wrapper.appendChild(title);
                 wrapper.appendChild(deleteBtn);
                 AddToGallery(wrapper, i);
             };
@@ -146,19 +149,35 @@ function UpdateSizeEstimate() {
 
 
 function readFileAsString(filePath, callback) {
-    fetch(filePath)
+    return fetch(filePath)
         .then(response => response.text())
         .then(text => callback(text))
         .catch(error => console.error('Error reading file:', error));
 }
 
+async function readImage(filePath, callback) {
+    return fetch(filePath)
+        .then(response => response.blob())
+        .then(f => callback(f))
+        .catch(error => console.error('Error reading file:', error));
+}
+
+
+function package(zip, fileName, filePath = "", isImage = false) {
+    let callback = (f) => {
+        zip.file(filePath + fileName, f);
+    }
+
+    if (isImage) return readImage('ReaderApp/' + filePath + fileName, callback);
+    else return readFileAsString('ReaderApp/' + filePath + fileName, callback);
+}
 
 
 
 
-// Handle ZIP download
-document.getElementById('download-btn').addEventListener('click', () => {
+function Download() {
     const zip = new JSZip();
+
     const images = document.querySelectorAll('#gallery img');
     let pagePaths = "";
 
@@ -172,22 +191,28 @@ document.getElementById('download-btn').addEventListener('click', () => {
     });
 
     zip.file('comic_pages.csv', pagePaths);
+    
+    // Create an array of promises for each packaging operation
+    const promises = [
+        package(zip, 'Reader.js'),
+        package(zip, 'settings.json'),
+        package(zip, 'PageLoader.js'),
+        package(zip, 'LocalStorageManager.js'),
+        package(zip, 'styles.css'),
+        package(zip, 'index.html'),
+        package(zip, 'arrowIcon.png', 'UIAssets/', true),
+        package(zip, 'resetIcon.png', 'UIAssets/', true),
+        package(zip, 'warningIcon.png', 'UIAssets/', true),
+        package(zip, 'fullScreenIcon.png', 'UIAssets/', true),
+        package(zip, 'favicon-16x16.png', 'favicon/', true),
+        package(zip, 'favicon-32x32.png', 'favicon/', true),
+        package(zip, 'favicon.ico', 'favicon/', true)
+    ];
 
-    readFileAsString('ReaderApp/index.html', (indexHtml) => {
-        zip.file('index.html', indexHtml);
-    });
-
-    readFileAsString('ReaderApp/styles.css', (stylesCSS) => {
-        zip.file('styles.css', stylesCSS);
-    });
-
-    readFileAsString('ReaderApp/PageLoader.js', (pageLoaderJs) => {
-        zip.file('PageLoader.js', pageLoaderJs);
-    });
-
-    readFileAsString('ReaderApp/Reader.js', (readerJs) => {
-        zip.file('Reader.js', readerJs);
-
+    Promise.all(promises).then(() => {
+        console.log("All files have been packaged and zipped.");
+        
+        // Now you can continue with the zip file, e.g., save or download it
         zip.generateAsync({ type: 'blob' })
             .then((content) => {
                 const a = document.createElement('a');
@@ -195,8 +220,61 @@ document.getElementById('download-btn').addEventListener('click', () => {
                 a.download = 'itchComic.zip';
                 a.click();
         });
+    }).catch(error => {
+        console.error('Error packaging files:', error);
     });
+}
+
+document.getElementById('download-btn').addEventListener('click', Download );
+
+
+// Handle ZIP download
+// document.getElementById('download-btn').addEventListener('click', () => {
+//     const zip = new JSZip();
+//     const images = document.querySelectorAll('#gallery img');
+//     let pagePaths = "";
+
+//     images.forEach((img, index) => {
+//         const imgData = img.src.split(',')[1]; // Get base64 data
+//         const extension = img.src.split(';')[0].split('/')[1]; // Get image extension
+//         const imgName = `page_${index + 1}.${extension}`;
+//         zip.file(`images/${imgName}`, imgData, { base64: true });
+//         pagePaths += `images/${imgName}`;
+//         if (index < images.length -1) pagePaths += '\n';
+//     });
+
+//     zip.file('comic_pages.csv', pagePaths);
+
+
+//     package(zip, 'settings.json');
+//     package(zip, 'PageLoader.js');
+//     package(zip, 'LocalStorageManager.js');
+//     package(zip, 'styles.css');
+//     package(zip, 'index.html');
+//     package(zip, 'arrowIcon.png', 'UIAssets/');
+//     package(zip, 'resetIcon.png', 'UIAssets/');
+//     package(zip, 'warningIcon.png', 'UIAssets/');
+//     package(zip, 'favicon-16x16.png', 'favicon/');
+//     package(zip, 'favicon-32x32.png', 'favicon/');
+//     package(zip, 'favicon.ico', 'favicon/');
+
+
+//     readFileAsString('ReaderApp/Reader.js', (readerJs) => {
+//         zip.file('Reader.js', readerJs);
+
+        
+//     });
+
+
+//     zip.generateAsync({ type: 'blob' })
+//             .then((content) => {
+//                 const a = document.createElement('a');
+//                 a.href = URL.createObjectURL(content);
+//                 a.download = 'itchComic.zip';
+//                 a.click();
+//         });
 
     
-});
+    
+// });
 
