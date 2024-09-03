@@ -89,6 +89,13 @@ img {
     #comicDescription {
         color: black;
     }
+
+    #versionID {
+        position: absolute;
+        bottom: -10px;
+        left: 10px;
+        color: lightgray;
+    }
 }
 
 #button-panel {

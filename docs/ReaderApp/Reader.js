@@ -74,8 +74,9 @@ class Reader {
             this.showPage();
         }
         else {
-            loadCSVFile("images/comic_pages.csv", (images) => {
+            loadCSVFile("images/comic_pages.csv", (images, imageFlags) => {
                 this.images = images;
+                this.imageFlags = imageFlags;
                 this.populatePageSelection();
                 this.showPage();
             });
@@ -199,6 +200,7 @@ class Reader {
         document.getElementById('comicTitle').textContent = settings.title || 'Comic Title';
         document.getElementById('comicAuthor').textContent = `by ${settings.author || 'Unknown'}`;
         document.getElementById('comicDescription').textContent = settings.description || 'No description available.';
+        document.getElementById('versionID').textContent = "v " + settings.versionID || 0.1;
 
         infoOverlay.style.display = 'flex';
     }

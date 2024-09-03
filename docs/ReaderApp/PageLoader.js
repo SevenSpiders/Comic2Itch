@@ -5,8 +5,16 @@ function loadCSVFile(filePath, callback) {
     fetch(filePath)
         .then(response => response.text())
         .then(text => {
-            let comicImages = text.split('\n').filter(row => row.trim() !== '');
-            if (callback) callback(comicImages);
+            let rows = text.split('\n').filter(row => row.trim() !== '');
+            let comicImages = [];
+            let flags = [];
+            rows.forEach(element => {
+                let line = element.split(',');
+                comicImages.push(line[0]);
+                if (line.length > 1) flags.push(line[1]);
+                else flags.push("");
+            });
+            if (callback) callback(comicImages, flags);
         })
         .catch(error => console.error('Error loading CSV file:', error));
 }
