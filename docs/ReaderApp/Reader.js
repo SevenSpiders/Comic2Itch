@@ -43,6 +43,7 @@ class Reader {
         this.moveThreshold = 5;
         this.comicImage = document.getElementById("comicImage");
         this.pageIndexElement = document.getElementById("pageIndex");
+        this.pageIndexElement.addEventListener('click', () => this.togglePageSelection());
         this.comicImage.addEventListener("dragstart", (event) => {
             event.preventDefault();
         });
@@ -60,6 +61,7 @@ class Reader {
         arrowRight.addEventListener('click', () => this.nextPage());
         document.getElementById('infoIcon').addEventListener('click', () => this.showInfoPanel());
         document.getElementById('closeInfoPanel').addEventListener('click', () => this.hideInfoPanel());
+
         this.updateBackground();
     }
 
@@ -67,34 +69,24 @@ class Reader {
         
         if (checkIfOpenedInPreview()) {
             this.images = localStorageManager.getArray();
+            this.populatePageSelection();
             this.showPage();
         }
         else {
             loadCSVFile("images/comic_pages.csv", (images) => {
                 this.images = images;
+                this.populatePageSelection();
                 this.showPage();
             });
         }
         
     }
 
-    // async loadSettings() {
-    //     try {
-    //         const response = await fetch("settings.json");
-    //         if (!response.ok) throw new Error(`Failed to load settings from ${"settings.json"}`);
-            
-    //         this.settings = await response.json();
-    //         this.updateBackground();
-    //     } catch (error) {
-    //         console.error("Error loading settings:", error);
-    //     }
-    // }
-
 
     showPage() {
         this.resetPage();
         comicImage.src = this.images[this.currentIndex];
-        pageIndexElement.textContent = `Page ${this.currentIndex + 1} / ${this.images.length}`;
+        pageIndexElement.innerText = `Page ${this.currentIndex + 1} / ${this.images.length}`;
         this.resetPage();
     }
 
@@ -204,7 +196,7 @@ class Reader {
 
     showInfoPanel() {
         document.getElementById('comicTitle').textContent = settings.title || 'Comic Title';
-        document.getElementById('comicAuthor').textContent = `Author: ${settings.author || 'Unknown'}`;
+        document.getElementById('comicAuthor').textContent = `by ${settings.author || 'Unknown'}`;
         document.getElementById('comicDescription').textContent = settings.description || 'No description available.';
 
         infoOverlay.style.display = 'flex';
@@ -216,6 +208,27 @@ class Reader {
 
     updateBackground() {
         document.body.style.backgroundColor = settings.backgroundColor || "black";
+    }
+
+    togglePageSelection() {
+        const menu = document.getElementById('page-select-menu');
+        if (menu.style.display === "none" || menu.style.display === "") {
+            menu.style.display = "block";
+        } else {
+            menu.style.display = "none";
+        }
+    }
+
+    populatePageSelection() {
+        const menu = document.getElementById('page-select-menu');
+        menu.innerText = "";
+        for (let i = 0; i < this.images.length; i++) {
+            const div = document.createElement('div');
+            div.className = "page-select-item";
+            div.innerText = "Page " + (i+1);
+            div.onclick = () => this.goToPage(i);
+            menu.appendChild(div);
+        }
     }
 }
 
