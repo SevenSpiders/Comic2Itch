@@ -61,6 +61,7 @@ class Reader {
         arrowRight.addEventListener('click', () => this.nextPage());
         document.getElementById('infoIcon').addEventListener('click', () => this.showInfoPanel());
         document.getElementById('closeInfoPanel').addEventListener('click', () => this.hideInfoPanel());
+        document.getElementById('infoOverlay').addEventListener('click', () => this.hideInfoPanel());
 
         this.updateBackground();
     }
