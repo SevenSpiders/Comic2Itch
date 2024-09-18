@@ -46,8 +46,10 @@ class Reader {
 
         this.images = [];
         this.imageElements = []; // preloaded image elements
-        this.loadImages();
         this.currentIndex = 0;
+
+
+        this.loadImages();
 
         this.moveThreshold = 5;
         this.comicImage = document.getElementById("comicImage");
@@ -109,7 +111,17 @@ class Reader {
     showPage() {
         this.resetPage();
         // comicImage.src = this.images[this.currentIndex];
-        comicImage.src = this.imageElements[this.currentIndex].src;
+        if (this.currentIndex < this.imageElements.length && this.currentIndex >= 0) {
+            comicImage.src = this.imageElements[this.currentIndex].src;
+        }
+        else if (this.currentIndex < this.images.length && this.currentIndex >= 0) {
+            comicImage.src = this.images[this.currentIndex];
+        }
+        else {
+            console.error("Could not load " + this.currentIndex);
+            comicImage.src = "images/placeHolder.png"
+        }
+
         pageIndexElement.innerText = `Page ${this.currentIndex + 1} / ${this.images.length}`;
         this.resetPage();
     }

@@ -253,7 +253,9 @@ function Download() {
         package(zip, 'closeIcon.png', 'UIAssets/', true),
         package(zip, 'favicon-16x16.png', 'favicon/', true),
         package(zip, 'favicon-32x32.png', 'favicon/', true),
-        package(zip, 'favicon.ico', 'favicon/', true)
+        package(zip, 'favicon.ico', 'favicon/', true),
+        package(zip, 'README.md'),
+        package(zip, 'placeHolder.png', 'images/', true)
     ];
 
     Promise.all(promises).then(() => {        
