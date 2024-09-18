@@ -1,5 +1,5 @@
 
-
+const background = document.getElementById("background");
 const comicImage = document.getElementById("comicImage");
 const pageIndexElement = document.getElementById("pageIndex");
 const arrowLeft = document.getElementsByClassName("arrow left")[0];
@@ -33,10 +33,19 @@ document.addEventListener('keydown', function(event) {
 });
 
 
+
+const iframe = document.getElementById('game_drop');
+comicImage.addEventListener('click', function() {
+    window.focus(); // Refocus the iframe content when the image is clicked
+});
+
+
+
 class Reader {
     constructor() {
 
         this.images = [];
+        this.imageElements = []; // preloaded image elements
         this.loadImages();
         this.currentIndex = 0;
 
@@ -51,15 +60,17 @@ class Reader {
         this.resetPage();
         comicImage.addEventListener('wheel', (event) => this.handleInputScroll(event));
         comicImage.addEventListener('mousedown', (event) => this.handleMouseDown(event));
-        comicImage.addEventListener('mousemove', (event) => this.handleDrag(event));
-        // document.addEventListener('mouseup', (event) => this.handleMouseUp(event));
+        // comicImage.addEventListener('mousemove', (event) => this.handleDrag(event));
+        document.getElementById("container").onmousemove = (event) => this.handleDrag(event);
+
+        background.onclick = (event) => this.click(event);
         comicImage.addEventListener('mouseup', (event) => this.handleMouseUp(event));
         document.getElementById("resetIcon").addEventListener('click',() => this.showPage());
         document.getElementById("fullScreenIcon").addEventListener('click', () => this.fullScreen());
 
         arrowLeft.addEventListener('click', () => this.previousPage());
         arrowRight.addEventListener('click', () => this.nextPage());
-        document.getElementById('infoIcon').addEventListener('click', () => this.showInfoPanel());
+        document.getElementById('infoIcon').addEventListener('click', (event) => this.showInfoPanel(event));
         document.getElementById('closeInfoPanel').addEventListener('click', () => this.hideInfoPanel());
         document.getElementById('infoOverlay').addEventListener('click', () => this.hideInfoPanel());
 
@@ -71,6 +82,7 @@ class Reader {
         if (checkIfOpenedInPreview()) {
             this.images = localStorageManager.getArray();
             this.populatePageSelection();
+            this.preloadImages();
             this.showPage();
         }
         else {
@@ -78,16 +90,26 @@ class Reader {
                 this.images = images;
                 this.imageFlags = imageFlags;
                 this.populatePageSelection();
+                this.preloadImages();
                 this.showPage();
             });
         }
         
     }
 
+    preloadImages() {
+        this.images.forEach((src, index) => {
+            const img = new Image();
+            img.src = src;
+            this.imageElements[index] = img;
+        });
+    }
+
 
     showPage() {
         this.resetPage();
-        comicImage.src = this.images[this.currentIndex];
+        // comicImage.src = this.images[this.currentIndex];
+        comicImage.src = this.imageElements[this.currentIndex].src;
         pageIndexElement.innerText = `Page ${this.currentIndex + 1} / ${this.images.length}`;
         this.resetPage();
     }
@@ -121,11 +143,6 @@ class Reader {
         else { this.previousPage(); }
     }
 
-    clickContainer(event) {
-        if (this.isDragging) return;
-        this.click(event);
-    }
-
     handleInputScroll(event) {
         if (!settings.canZoom) return;
         event.preventDefault();
@@ -141,6 +158,7 @@ class Reader {
     
     handleMouseDown(event) {
         event.preventDefault(); // Prevent default behavior
+
         this.isDragging = true;
         this.startX = event.clientX - this.originX;
         this.startY = event.clientY - this.originY;
@@ -170,6 +188,7 @@ class Reader {
         const movedY = Math.abs(event.clientY - this.Y0);
         // console.log("X: " +movedX + ", Y: " + movedY);
         if (movedX < this.moveThreshold && movedY < this.moveThreshold) this.click(event);
+        // event.stopPropagation();
     }
 
     resetPage() {
@@ -196,13 +215,14 @@ class Reader {
     };
 
 
-    showInfoPanel() {
+    showInfoPanel(event) {
         document.getElementById('comicTitle').textContent = settings.title || 'Comic Title';
         document.getElementById('comicAuthor').textContent = `by ${settings.author || 'Unknown'}`;
         document.getElementById('comicDescription').textContent = settings.description || 'No description available.';
         document.getElementById('versionID').textContent = "v " + settings.versionID || 0.1;
 
         infoOverlay.style.display = 'flex';
+        // event.stopPropagation();
     }
 
     hideInfoPanel() {
@@ -241,4 +261,3 @@ class Reader {
 
 
 const reader = new Reader();
-reader.showPage();
