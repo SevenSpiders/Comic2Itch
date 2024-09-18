@@ -41,6 +41,7 @@ loadSettings();
 document.getElementById('settings-btn').addEventListener('click', function() {
     const infoOverlay = document.getElementById('infoOverlay');
     infoOverlay.style.display = 'flex';
+    this.innerHTML = this.innerHTML.replace("*", ""); // remove asterisk
 });
 
 document.getElementById('closeInfoPanel').addEventListener('click', () => {infoOverlay.style.display = 'none'});
