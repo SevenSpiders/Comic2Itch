@@ -20,6 +20,17 @@ document.getElementById('delete-all-btn').addEventListener('click', () => {
     UpdateSizeEstimate();
 });
 
+
+
+const beforeUnloadHandler = (event) => {
+    event.preventDefault(); // Recommended
+    event.returnValue = true; // Included for legacy support, e.g. Chrome/Edge < 119
+};
+window.addEventListener("beforeunload", beforeUnloadHandler);
+
+
+  
+
 let settings = {}
 function loadSettings() {
     fetch("ReaderApp/settings.json")
